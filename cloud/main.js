@@ -1,7 +1,8 @@
-
-Parse.Cloud.define('hello', function(req, res) {
-  res.success('Hi');
-});
+/**
+  * FRIEND REQUEST HANDLING
+  * Cloud code function addFriend
+  * BeforeSave for Request Object
+*/
 
 Parse.Cloud.define('addFriend', function(req, res) {
   // check if request exists on other end -> toUser = req.fromUser
@@ -14,25 +15,38 @@ Parse.Cloud.define('addFriend', function(req, res) {
   var targetUser = new User();
   targetUser.id = targetUserID;
 
-  var friendRequest = new Request();
-  friendRequest.save({
-    fromUser: originUser,
-    toUser: targetUser
-    }, {
-      success: function(result) {
-        res.success(result);
-      },
-      error: function(result, error) {
-        res.error(error);
-      }
+  checkIfRequestExists(originUser, targetUser).then(function(){
+    var friendRequest = new Request();
+    friendRequest.save({
+      fromUser: originUser,
+      toUser: targetUser
+      }, {
+        success: function(result) {
+          res.success(result);
+        },
+        error: function(result, error) {
+          res.error(error);
+        }
+    });
+  }).catch(function(){
+    res.error();
   });
 
 });
 
-Parse.Cloud.beforeSave('Request', function(req, res) {
-  if(req.object.isNew()){
-    res.success();
-  } else {
-    res.error();
-  }
-});
+var checkIfRequestExists = function(_fromUser, _toUser){
+  var promise = new Parse.Promise();
+  var query = new Parse.Query('Request');
+  query.equalTo('fromUser', _fromUser);
+  query.equalTo('toUser', _toUser);
+  query.count({
+    success: function(count){
+      if (count > 0) {
+        promise.reject();
+      } else {
+        promise.resolve();
+      }
+    }
+  );
+  return promise;
+}
