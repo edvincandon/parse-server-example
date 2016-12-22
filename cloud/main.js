@@ -16,7 +16,6 @@ Parse.Cloud.define('addFriend', function(req, res) {
   targetUser.id = targetUserID;
   checkIfRequestExists(originUser, targetUser).then(function(){
     checkIfRequestExistsOnOtherEnd(originUser, targetUser).then(function(sym){
-      console.log(sym);
       var status = (sym.hasSymmetricalRequest) ? 1 : 0;
       var friendRequest = new Request();
       friendRequest.save({
@@ -25,7 +24,21 @@ Parse.Cloud.define('addFriend', function(req, res) {
         status: status,
         }, {
           success: function(result) {
-            res.success(result);
+            if(sym.hasSymmetricalRequest){
+              var symmetricalRequest = sym.symmetricalRequest;
+              symmetricalRequest.save({
+                status: 1
+              }, {
+                success: function(){
+                  res.success(result);
+                },
+                error: function(){
+                  res.success(result);
+                }
+              })
+            } else {
+              res.success(result);
+            }
           },
           error: function(result, error) {
             res.error(error);
