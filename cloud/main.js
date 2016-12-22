@@ -14,7 +14,7 @@ Parse.Cloud.define('addFriend', function(req, res) {
   var targetUserID = req.params.toUser;
   var targetUser = new User();
   targetUser.id = targetUserID;
-
+  checkIfRequestExistsOnOtherEnd(targetUser, originUser);
   checkIfRequestExists(originUser, targetUser).then(function(){
     var friendRequest = new Request();
     friendRequest.save({
@@ -29,7 +29,7 @@ Parse.Cloud.define('addFriend', function(req, res) {
         }
     });
   }).catch(function(){
-    res.error();
+    res.error('Request already exists');
   });
 
 });
@@ -49,4 +49,19 @@ var checkIfRequestExists = function(_fromUser, _toUser){
     }
   });
   return promise;
+}
+
+var checkIfRequestExistsOnOtherEnd = function(_fromUser, _toUser){
+  var query = new Parse.Query('Request');
+  query.equalTo('toUser', _fromUser);
+  query.equalTo('fromUser', _toUser);
+  query.find({
+    success: function(result){
+      console.log('hello');
+      console.log(result);
+    },
+    error: function(){
+
+    }
+  });
 }
