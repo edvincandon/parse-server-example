@@ -14,7 +14,6 @@ Parse.Cloud.define('addFriend', function(req, res) {
   var targetUser = new User();
   targetUser.id = targetUserID;
 
-
   var friendRequest = new Request();
   friendRequest.save({
     fromUser: originUser,
@@ -28,4 +27,12 @@ Parse.Cloud.define('addFriend', function(req, res) {
       }
   });
 
+});
+
+Parse.Cloud.beforeSave('Request', function(req, res) {
+  if(req.object.isNew()){
+    res.success();
+  } else {
+    res.error();
+  }
 });
