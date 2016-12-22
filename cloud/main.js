@@ -14,19 +14,25 @@ Parse.Cloud.define('addFriend', function(req, res) {
   var targetUserID = req.params.toUser;
   var targetUser = new User();
   targetUser.id = targetUserID;
-  checkIfRequestExistsOnOtherEnd(targetUser, originUser);
   checkIfRequestExists(originUser, targetUser).then(function(){
-    var friendRequest = new Request();
-    friendRequest.save({
-      fromUser: originUser,
-      toUser: targetUser
-      }, {
-        success: function(result) {
-          res.success(result);
-        },
-        error: function(result, error) {
-          res.error(error);
-        }
+    checkIfRequestExistsOnOtherEnd(originUser, targetUser).then(function(sym){
+      console.log(sym);
+      var status = (sym.hasSymmetricalRequest) ? 1 : 0;
+      var friendRequest = new Request();
+      friendRequest.save({
+        fromUser: originUser,
+        toUser: targetUser,
+        status: status,
+        }, {
+          success: function(result) {
+            res.success(result);
+          },
+          error: function(result, error) {
+            res.error(error);
+          }
+      });
+    }).catch(function(){
+      res.error('Something went wrong');
     });
   }).catch(function(){
     res.error('Request already exists');
@@ -52,16 +58,23 @@ var checkIfRequestExists = function(_fromUser, _toUser){
 }
 
 var checkIfRequestExistsOnOtherEnd = function(_fromUser, _toUser){
+  var promise = new Parse.Promise();
   var query = new Parse.Query('Request');
   query.equalTo('toUser', _fromUser);
   query.equalTo('fromUser', _toUser);
   query.find({
     success: function(result){
-      console.log('hello');
-      console.log(result);
+      // if exists, result.length == 1
+      if(result.length > 0){
+        var symmetricalRequest = result[0];
+        promise.resolve({hasSymmetricalRequest: true, symmetricalRequest: symmetricalRequest});
+      } else {
+        promise.resolve({hasSymmetricalRequest: false});
+      }
     },
     error: function(){
-
+      promise.reject();
     }
   });
+  return promise;
 }
