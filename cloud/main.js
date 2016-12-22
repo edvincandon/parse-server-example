@@ -12,7 +12,7 @@ Parse.Cloud.define('addFriend', function(req, res) {
   var originUser = req.user;
   var targetUserID = req.params.toUser;
   var targetUser = new User();
-  targerUser.id = targetUserID;
+  targetUser.id = targetUserID;
 
 
   var friendRequest = new Request();
