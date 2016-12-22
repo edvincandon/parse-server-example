@@ -47,6 +47,6 @@ var checkIfRequestExists = function(_fromUser, _toUser){
         promise.resolve();
       }
     }
-  );
+  });
   return promise;
 }
