@@ -25,6 +25,7 @@ Parse.Cloud.define('addFriend', function(req, res) {
         }, {
           success: function(result) {
             if(sym.hasSymmetricalRequest){
+              console.log(sym);
               var symmetricalRequest = sym.symmetricalRequest;
               symmetricalRequest.save({
                 status: 1
