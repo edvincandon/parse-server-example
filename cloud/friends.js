@@ -90,3 +90,34 @@ exports.addFriend = function(req, res) {
     res.error('Request already exists');
   });
 }
+
+var getFromUserRequests = function(req, res){
+  var promise = new Parse.Promise();
+  var query = new Parse.Query('Request');
+  query.equalTo('fromUser', req.user);
+  query.include('toUser');
+  query.find({
+      success: function(result){
+        var data = result.map( function(map){
+          var toUser = map.get('toUser');
+          return {
+            id: map.id,
+            status: map.get('status'),
+            toUsername: toUser.get('specialUsername'),
+            toUserID: toUser.id,
+          }
+        });
+        promise.resolve(data);
+      },
+      error: function(result, error){
+        promise.reject(error);
+      },
+    });
+  return promise;
+}
+
+exports.getAllRequests = function(req, res){
+  // get friends, sent requests, received requests
+  var fromUserRequests = getFromUserRequests(req, res);
+  fromUserRequests.then(function(data){ console.log(data); });
+}
