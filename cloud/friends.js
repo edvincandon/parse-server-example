@@ -116,8 +116,39 @@ var getFromUserRequests = function(req, res){
   return promise;
 }
 
+var getToUserRequests = function(req, res){
+  var promise = new Parse.Promise();
+  var query = new Parse.Query('Request');
+  query.equalTo('toUser', req.user);
+  query.include('fromUser');
+  query.equalTo('status', 0);
+  query.find({
+      success: function(result){
+        var data = result.map( function(map){
+          var fromUser = map.get('fromUser');
+          return {
+            id: map.id,
+            status: map.get('status'),
+            fromUsername: fromUser.get('specialUsername'),
+            fromUserID: fromUser.id,
+          }
+        });
+        promise.resolve(data);
+      },
+      error: function(result, error){
+        promise.reject(error);
+      },
+    });
+  return promise;
+}
+
 exports.getAllRequests = function(req, res){
   // get friends, sent requests, received requests
   var fromUserRequests = getFromUserRequests(req, res);
-  fromUserRequests.then(function(data){ console.log(data); });
+  var toUserRequests = getToUserRequests(req, res);
+  Parse.Promise.when(fromUserRequests, toUserRequests).then(function(dataFrom, dataTo) {
+    res.success({fromUserRequests: dataFrom, toUserRequests: dataTo});
+  }).catch(function(error){
+    res.error(error);
+  });
 }
