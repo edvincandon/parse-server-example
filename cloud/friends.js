@@ -71,8 +71,8 @@ exports.addFriend = function(req, res) {
                 success: function(){
                   res.success(result);
                 },
-                error: function(){
-                  res.success(result);
+                error: function(error){
+                  res.error(error);
                 }
               })
             } else {
@@ -98,15 +98,7 @@ var getFromUserRequests = function(req, res){
   query.include('toUser');
   query.find({
       success: function(result){
-        var data = result.map( function(map){
-          var toUser = map.get('toUser');
-          return {
-            id: map.id,
-            status: map.get('status'),
-            toUsername: toUser.get('specialUsername'),
-            toUserID: toUser.id,
-          }
-        });
+        var data = mapRequest(result, 'toUser');
         promise.resolve(data);
       },
       error: function(result, error){
@@ -124,15 +116,7 @@ var getToUserRequests = function(req, res){
   query.equalTo('status', 0);
   query.find({
       success: function(result){
-        var data = result.map( function(map){
-          var fromUser = map.get('fromUser');
-          return {
-            id: map.id,
-            status: map.get('status'),
-            fromUsername: fromUser.get('specialUsername'),
-            fromUserID: fromUser.id,
-          }
-        });
+        var data = mapRequest(result, 'fromUser');
         promise.resolve(data);
       },
       error: function(result, error){
@@ -141,6 +125,30 @@ var getToUserRequests = function(req, res){
     });
   return promise;
 }
+
+var mapRequest = function(arrayOfRequests, _include){
+  var data = arrayOfRequests.map(function(map){
+    var fromUser = map.get('fromUser');
+    var toUser = map.get('toUser');
+    if (_include === 'fromUser'){
+      return {
+        id: map.id,
+        status: map.get('status'),
+        fromUsername: fromUser.get('specialUsername'),
+        fromUserID: fromUser.id,
+      }
+    } else if(_include === 'toUser'){
+      return {
+        id: map.id,
+        status: map.get('status'),
+        toUsername: toUser.get('specialUsername'),
+        toUserID: toUser.id,
+      }
+    }
+  });
+  return data;
+}
+
 
 exports.getAllRequests = function(req, res){
   // get friends, sent requests, received requests
