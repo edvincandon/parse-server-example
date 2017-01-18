@@ -69,14 +69,14 @@ exports.addFriend = function(req, res) {
                 status: 1
               }, {
                 success: function(){
-                  res.success(result);
+                  res.success(data);
                 },
                 error: function(error){
                   res.error(error);
                 }
               })
             } else {
-              res.success(result);
+              res.success(data);
             }
           },
           error: function(result, error) {
