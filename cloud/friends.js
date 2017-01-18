@@ -62,25 +62,25 @@ exports.addFriend = function(req, res) {
         status: status,
         }, {
           success: function(result) {
-            var data = mapRequest([result], 'toUser');
-            if(sym.hasSymmetricalRequest){
-              var symmetricalRequest = sym.symmetricalRequest;
-              symmetricalRequest.save({
-                status: 1
-              }, {
-                success: function(){
-                  res.success(result);
-                },
-                error: function(error){
-                  res.error(error);
+            var toUser = result.get("toUser");
+            toUser.fetch({
+              success: function(_toUser) {
+                //_toUser
+                var data = mapRequest([result], 'toUser');
+                if(sym.hasSymmetricalRequest){
+                  var symmetricalRequest = sym.symmetricalRequest;
+                  symmetricalRequest.save({
+                    status: 1
+                  }, {
+                    success: function(){
+                      res.success(data);
+                    }
+                  })
+                } else {
+                  res.success(data);
                 }
-              })
-            } else {
-              res.success(result);
-            }
-          },
-          error: function(result, error) {
-            res.error(error);
+              }
+            });
           }
       });
     }).catch(function(){
