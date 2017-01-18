@@ -62,21 +62,21 @@ exports.addFriend = function(req, res) {
         status: status,
         }, {
           success: function(result) {
+            var data = mapRequest(result, 'toUser');
             if(sym.hasSymmetricalRequest){
-              console.log(sym);
               var symmetricalRequest = sym.symmetricalRequest;
               symmetricalRequest.save({
                 status: 1
               }, {
                 success: function(){
-                  res.success(result);
+                  res.success(data);
                 },
                 error: function(error){
                   res.error(error);
                 }
               })
             } else {
-              res.success(result);
+              res.success(data);
             }
           },
           error: function(result, error) {
