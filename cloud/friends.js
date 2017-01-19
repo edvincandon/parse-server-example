@@ -182,6 +182,9 @@ exports.getAllRequests = function(req, res){
 
 exports.acceptFriendRequest = function(req, res){
   // should set pending request to 1 and clone a symmetrical request
+  var User = Parse.Object.extend('User');
+  var Request = Parse.Object.extend('Request');
+
   var acceptRequest = new Request();
   acceptRequest.id = req.params.id;
 
