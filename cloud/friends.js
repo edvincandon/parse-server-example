@@ -198,9 +198,9 @@ exports.acceptFriendRequest = function(req, res){
     { success: function(){
       createNewRequest(toUser, fromUser, 1).then(function(result){
         res.success(result);
-      }).catch(error){
+      }).catch(function(error){
         res.error(error);
-      }
+      });
     }, error: function(error){
       res.error(error);
     }
