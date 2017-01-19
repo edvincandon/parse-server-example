@@ -58,14 +58,14 @@ var createNewRequest = function(_fromUser, _toUser, _status){
           success: function(_toUser) {
             var data = mapRequest([result], 'toUser');
             promise.resolve(data);
-          });
+          }
+        });
       },
       error: function(data){
         promise.reject(data);
       }
     });
-  }
-}).catch(function(){
+  }).catch(function(){
     promise.reject('Request already exists');
   });
   return promise;
