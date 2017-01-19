@@ -61,7 +61,7 @@ var createNewRequest = function(_fromUser, _toUser, _status){
           }
         });
       },
-      error: function(data){
+      error: function(data, error){
         promise.reject(data);
       }
     });
@@ -210,7 +210,7 @@ exports.acceptFriendRequest = function(req, res){
       }).catch(function(error){
         res.error(error);
       });
-    }, error: function(error){
+    }, error: function(o, error){
       res.error(error);
     }
   });
@@ -219,6 +219,22 @@ exports.acceptFriendRequest = function(req, res){
 
 exports.rejectFriendRequest = function(req, res){
   // should delete pending request
+  var Request = Parse.Object.extend('Request');
+  var query = new Parse.Query(Request);
+  query.get(req.params.id, {
+    success: function(result) {
+      result.destroy({
+      success: function(deleted){
+        var data = mapRequest(deleted, 'fromUser');
+        res.success(data);
+      },
+      error: function(o, error){ res.error(error); }
+      });
+    },
+    error: function(object, error) {
+      res.error(error);
+    }
+  });
 }
 
 exports.blockFriendRequest = function(req, res){
