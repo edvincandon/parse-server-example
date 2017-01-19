@@ -48,7 +48,7 @@ var createNewRequest = function(_fromUser, _toUser, _status){
   var Request = Parse.Object.extend('Request');
   var newRequest = new Request();
   newRequest.save({
-    fromUser: fromUser,
+    fromUser: _fromUser,
     toUser: _toUser,
     status: _status
   }, {
