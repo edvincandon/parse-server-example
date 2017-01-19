@@ -44,7 +44,7 @@ var checkIfRequestExistsOnOtherEnd = function(_fromUser, _toUser){
 
 var createNewRequest = function(_fromUser, _toUser, _status){
   var promise = new Parse.Promise();
-
+  console.log(_fromUser, _toUser, _status);
   var Request = Parse.Object.extend('Request');
   var newRequest = new Request();
   newRequest.save({
@@ -53,9 +53,11 @@ var createNewRequest = function(_fromUser, _toUser, _status){
     status: _status
   }, {
     success: function(data){
+      console.log('gogo');
       promise.resolve(data);
     },
     error: function(data){
+      console.log('fail');
       promise.reject(data);
     }
   });
