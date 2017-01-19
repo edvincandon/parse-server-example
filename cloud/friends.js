@@ -225,7 +225,7 @@ exports.rejectFriendRequest = function(req, res){
     success: function(result) {
       result.destroy({
       success: function(deleted){
-        var data = mapRequest(deleted, 'fromUser');
+        var data = mapRequest([deleted], 'fromUser');
         res.success(data);
       },
       error: function(o, error){ res.error(error); }
