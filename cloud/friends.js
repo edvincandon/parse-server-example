@@ -44,6 +44,8 @@ var checkIfRequestExistsOnOtherEnd = function(_fromUser, _toUser){
 
 var createNewRequest = function(_fromUser, _toUser, _status){
   var promise = new Parse.Promise();
+
+  var Request = Parse.Object.extend('Request');
   var newRequest = new Request();
   newRequest.save({
     fromUser: fromUser,
@@ -196,7 +198,9 @@ exports.acceptFriendRequest = function(req, res){
     { success: function(){
       createNewRequest(toUser, fromUser, 1).then(function(result){
         res.success(result);
-      })
+      }).catch(error){
+        res.error(error);
+      }
     }, error: function(error){
       res.error(error);
     }
