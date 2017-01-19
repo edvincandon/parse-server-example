@@ -192,7 +192,7 @@ exports.acceptFriendRequest = function(req, res){
   var fromUser = new User();
   fromUser.id = req.params.fromUserID;
 
-  friendRequest.save({status: 1},
+  acceptRequest.save({status: 1},
     { success: function(){
       createNewRequest(toUser, fromUser, 1).then(function(result){
         res.success(result);
