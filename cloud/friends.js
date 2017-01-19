@@ -44,22 +44,28 @@ var checkIfRequestExistsOnOtherEnd = function(_fromUser, _toUser){
 
 var createNewRequest = function(_fromUser, _toUser, _status){
   var promise = new Parse.Promise();
-  console.log(_fromUser, _toUser, _status);
   var Request = Parse.Object.extend('Request');
   var newRequest = new Request();
-  newRequest.save({
-    fromUser: _fromUser,
-    toUser: _toUser,
-    status: _status
-  }, {
-    success: function(data){
-      console.log('gogo');
-      promise.resolve(data);
-    },
-    error: function(data){
-      console.log('fail');
-      promise.reject(data);
-    }
+  checkIfRequestExists(_fromUser, _toUser).then(function(){
+    newRequest.save({
+      fromUser: _fromUser,
+      toUser: _toUser,
+      status: _status
+    }, {
+      success: function(result){
+        var toUser = result.get("toUser");
+        toUser.fetch({
+          success: function(_toUser) {
+            var data = mapRequest([result], 'toUser');
+            promise.resolve(data);
+          });
+      },
+      error: function(data){
+        promise.reject(data);
+      }
+    });
+  }).catch(function(){
+    promise.reject('Request already exists');
   });
   return promise;
 }
