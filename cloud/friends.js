@@ -64,7 +64,8 @@ var createNewRequest = function(_fromUser, _toUser, _status){
         promise.reject(data);
       }
     });
-  }).catch(function(){
+  }
+}).catch(function(){
     promise.reject('Request already exists');
   });
   return promise;
