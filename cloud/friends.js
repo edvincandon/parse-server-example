@@ -42,6 +42,25 @@ var checkIfRequestExistsOnOtherEnd = function(_fromUser, _toUser){
   return promise;
 }
 
+var createNewRequest = function(_fromUser, _toUser, _status){
+  var promise = new Parse.Promise();
+  var newRequest = new Request();
+  newRequest.save({
+    fromUser: fromUser,
+    toUser: _toUser,
+    status: _status
+  }, {
+    success: function(data){
+      promise.resolve(data);
+    },
+    error: function(data){
+      promise.reject(data);
+    }
+  });
+  return promise;
+}
+
+
 exports.addFriend = function(req, res) {
   // check if request exists on other end -> toUser = req.fromUser
   // if exists set it to status APPROVED
@@ -159,4 +178,33 @@ exports.getAllRequests = function(req, res){
   }).catch(function(error){
     res.error(error);
   });
+}
+
+exports.acceptFriendRequest = function(req, res){
+  // should set pending request to 1 and clone a symmetrical request
+  var acceptRequest = new Request();
+  acceptRequest.id = req.params.id;
+
+  var toUser = req.user;
+  var fromUser = new User();
+  fromUser.id = req.params.fromUserID;
+
+  friendRequest.save({status: 1},
+    { success: function(){
+      createNewRequest(toUser, fromUser, 1).then(function(result){
+        res.success(result);
+      })
+    }, error: function(error){
+      res.error(error);
+    }
+  });
+
+}
+
+exports.rejectFriendRequest = function(req, res){
+  // should delete pending request
+}
+
+exports.blockFriendRequest = function(req, res){
+  // should find symmetrical request and set it to status BLOCKED
 }
